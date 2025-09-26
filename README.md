@@ -13,6 +13,7 @@ The agent leverages the **LangChain** framework and is built with a robust, mult
     * `TavilySearchResults`: For fast and accurate web searches.
     * `PythonREPLTool`: For executing Python code to perform calculations or string manipulations.
     * `get_youtube_transcript`: A custom tool to fetch and analyze YouTube video transcripts.
+* **Integrated Observability**: Utilizes Langfuse to provide detailed, step-by-step tracing of the agent's execution, including tool usage, LLM inputs/outputs, latency, and token costs.
 * **Universal ReAct Parser**: A custom-built output parser (`UniversalReactOutputParser`) that intelligently handles both JSON and plain-text tool inputs, making the agent compatible with a wide range of LLMs.
 * **Resilient Error Handling**: The agent's prompt and tools are designed to gracefully handle failures (e.g., unavailable video transcripts, IP blocks), allowing it to pivot its strategy instead of terminating.
 * **Model Agnostic**: Easily configurable to run with various LLMs, including local models via Ollama (like `qwen` or `llama3`) and API-based models from Google (Gemini).
@@ -25,6 +26,7 @@ The agent leverages the **LangChain** framework and is built with a robust, mult
 * **Framework**: [LangChain](https://www.langchain.com/)
 * **LLMs**: Configured for [Ollama](https://ollama.com/), [Google Gemini](https://ai.google.dev/)
 * **Core Tools**: [Tavily Search API](https://tavily.com/), Python REPL
+* **Observability**: [Langfuse] (https://langfuse.com/)
 * **UI**: [Gradio](https://www.gradio.app/)
 * **Deployment**: Hugging Face Spaces
 
@@ -71,6 +73,10 @@ TAVILY_API_KEY="tvly-..."
 
 # Required if using the Gemini model
 GOOGLE_API_KEY="AIza..."
+
+# Required for observability with Langfuse
+LANGFUSE_PUBLIC_KEY="pk-lf-..."
+LANGFUSE_SECRET_KEY="sk-lf-..."
 ```
 
 ### 5. Run the Application
@@ -93,4 +99,4 @@ The agent's design is centered around the **ReAct (Reasoning and Acting)** frame
 2.  **LLM**: The "brain" of the agent. The code is flexible enough to use different models, with the default set to a local `qwen` model via Ollama for privacy and cost-effectiveness.
 3.  **Tools**: The agent's "hands." It has a set of capabilities that it can invoke to interact with the outside world, find information, or perform computations.
 4.  **Universal Parser**: This custom component is the "ears." It listens to the LLM's output and reliably translates its intent into a structured `AgentAction` or a `AgentFinish` signal, even when the LLM's output format is inconsistent.
-5.  **Agent Executor**: The main runtime that orchestrates the loop: it sends the prompt to the LLM, receives the desired action, calls the corresponding tool, gets the result, and feeds it back to the LLM until the problem is solved.
+5.  **Agent Executor**: The main runtime that orchestrates the loop: it sends the prompt to the LLM, receives the desired action, calls the corresponding tool, gets the result, and feeds it back to the LLM until the problem is solved. It is integrated with a Langfuse CallbackHandler to automatically capture and send detailed traces of every run.

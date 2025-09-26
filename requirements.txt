@@ -11,3 +11,4 @@ python-dotenv
 langchain_huggingface
 langchain_google_genai
 youtube-transcript-api
+langfuse

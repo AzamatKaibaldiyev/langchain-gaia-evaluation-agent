@@ -15,7 +15,7 @@ from langchain_community.chat_models import ChatOllama
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_experimental.tools import PythonREPLTool
 from langchain.agents import create_react_agent, AgentExecutor
-
+from langfuse.langchain import CallbackHandler
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
@@ -219,12 +219,25 @@ def create_agent(model_source="qwen", api_key=None):
 class LangChainAgent:
     def __init__(self):
         self.agent_executor = create_agent()
+        # Initialize the Langfuse handler. It will automatically use the environment variables.
+        # We give it a session_id to group all runs within a single "Run Evaluation" click.
+        self.langfuse_handler = CallbackHandler()
+        print("Langfuse CallbackHandler initialized.")
 
-    def __call__(self, question: str) -> str:
+    def __call__(self, question: str, task_id: str) -> str:
         print(f"Agent received question: {question[:100]}...")
         try:
+
+             # We will pass the task_id as metadata to easily find this specific run in Langfuse.
+            config = {
+                "callbacks": [self.langfuse_handler],
+                "metadata": {
+                    "task_id": task_id,
+                }
+            }
+
             # The agent executor returns a dictionary, the final answer is in the 'output' key.
-            response = self.agent_executor.invoke({"input": question})
+            response = self.agent_executor.invoke({"input": question}, config=config)
             print("START________________________________________________________________________")
             print(response)
             print("END_____________________________________________")
@@ -284,7 +297,7 @@ def run_and_submit_all( profile: gr.OAuthProfile | None):
     # 3. Run your Agent
     results_log = []
     answers_payload = []
-    questions_data = questions_data[:]
+    questions_data = questions_data[:2]
     print(f"Running agent on {len(questions_data)} questions...")
     for item in questions_data:
         task_id = item.get("task_id")
@@ -293,7 +306,7 @@ def run_and_submit_all( profile: gr.OAuthProfile | None):
             print(f"Skipping item with missing task_id or question: {item}")
             continue
         try:
-            submitted_answer = agent(question_text)
+            submitted_answer = agent(question_text, task_id=task_id)
             answers_payload.append({"task_id": task_id, "submitted_answer": submitted_answer})
             results_log.append({"Task ID": task_id, "Question": question_text, "Submitted Answer": submitted_answer})
         except Exception as e:
