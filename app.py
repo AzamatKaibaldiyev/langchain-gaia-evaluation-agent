@@ -297,7 +297,7 @@ def run_and_submit_all( profile: gr.OAuthProfile | None):
     # 3. Run your Agent
     results_log = []
     answers_payload = []
-    questions_data = questions_data[:2]
+    questions_data = questions_data[:]
     print(f"Running agent on {len(questions_data)} questions...")
     for item in questions_data:
         task_id = item.get("task_id")
