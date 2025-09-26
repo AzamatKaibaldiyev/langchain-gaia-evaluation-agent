@@ -1,0 +1,13 @@
+gradio
+requests
+huggingface_hub
+transformers
+langchain
+langchain-community
+langchain-experimental
+langchainhub
+tavily-python
+python-dotenv
+langchain_huggingface
+langchain_google_genai
+youtube-transcript-api

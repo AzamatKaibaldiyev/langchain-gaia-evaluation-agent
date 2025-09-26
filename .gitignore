@@ -1,0 +1,22 @@
+# --- Environment Variables ---
+# Never commit secret keys or local environment configurations
+.env
+
+# --- Python Virtual Environment ---
+# Never commit installed packages
+venv/
+.venv/
+
+# --- Python Cache ---
+# Ignore compiled Python files and cache directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- OS-specific files ---
+# For macOS users
+.DS_Store
+
+# For Windows users
+Thumbs.db
